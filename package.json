@@ -1,0 +1,30 @@
+{
+  "name": "moba",
+  "version": "0.1.0",
+  "description": "Modern admin panel for Rails using React and Superglue",
+  "main": "app/javascript/moba/application.tsx",
+  "scripts": {
+    "build": "esbuild app/javascript/moba/application.tsx --bundle --outfile=app/assets/builds/moba.js --format=esm --target=es2020 --sourcemap",
+    "build:css": "tailwindcss -i app/assets/stylesheets/moba/application.css -o app/assets/builds/moba.css --minify",
+    "watch": "esbuild app/javascript/moba/application.tsx --bundle --outfile=app/assets/builds/moba.js --format=esm --target=es2020 --sourcemap --watch",
+    "watch:css": "tailwindcss -i app/assets/stylesheets/moba/application.css -o app/assets/builds/moba.css --watch"
+  },
+  "keywords": ["rails", "admin", "react", "superglue", "typescript"],
+  "author": "Luca Castelnovo <luca@monade.io>",
+  "license": "MIT",
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
+    "@tanstack/react-table": "^8.21.3",
+    "@thoughtbot/superglue": "^1.0.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-redux": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "esbuild": "^0.24.0",
+    "tailwindcss": "^4.2.0",
+    "typescript": "^5.8.2"
+  }
+}
