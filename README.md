@@ -1,6 +1,6 @@
 # Moba
 
-Pannello di amministrazione moderno per Rails, costruito con React, TypeScript e [Superglue](https://thoughtbot.github.io/superglue/).
+Pannello di amministrazione per Rails, costruito con React, TypeScript e [Superglue](https://thoughtbot.github.io/superglue/).
 
 ## Requisiti
 
