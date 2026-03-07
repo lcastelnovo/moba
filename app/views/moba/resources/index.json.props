@@ -1,0 +1,14 @@
+json.resourceName @resource_class.plural_human_name
+json.resourceKey params[:resource_id]
+json.singularName @resource_class.human_name
+
+json.fields @fields
+
+json.records do
+  json.array! @records do |record|
+    json.id record.id
+    @fields.each do |field|
+      json.set! field[:name], record.send(field[:attribute])
+    end
+  end
+end

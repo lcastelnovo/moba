@@ -1,0 +1,38 @@
+path = request.format.json? ? param_to_dig_path(params[:props_at]) : nil
+
+json.data(dig: path) do
+  json.currentUser do
+    json.id current_user.id
+    json.email current_user.email
+  end if current_user
+
+  json.basePath moba.root_path.chomp("/")
+
+  json.resources Moba.registered_resources.map { |r|
+    { key: r.plural_resource_name, label: r.plural_human_name }
+  }
+
+  yield json
+end
+
+json.componentIdentifier active_template_virtual_path
+json.defers json.deferred!
+json.fragments json.fragments!
+json.assets [ asset_path('moba.js') ]
+
+if protect_against_forgery?
+  json.csrfToken form_authenticity_token
+end
+
+if path
+  json.action 'graft'
+  json.path params[:props_at]
+end
+
+json.restoreStrategy 'fromCacheAndRevisitInBackground'
+
+json.renderedAt Time.now.to_i
+
+json.slices do
+  json.flash flash.to_h
+end

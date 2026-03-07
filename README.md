@@ -1,39 +1,112 @@
 # Moba
 
-TODO: Delete this and the text below, and describe your gem
+Pannello di amministrazione moderno per Rails, costruito con React, TypeScript e [Superglue](https://thoughtbot.github.io/superglue/).
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/moba`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Requisiti
 
-## Installation
+- Ruby >= 3.1
+- Rails >= 7.0
+- Node.js >= 22
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+## Installazione
 
-Install the gem and add to the application's Gemfile by executing:
+Aggiungi la gem al `Gemfile` della tua applicazione Rails:
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem "moba", path: "/path/to/moba"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Installa le dipendenze:
 
 ```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+bundle install
 ```
 
-## Usage
+Monta l'engine nel file `config/routes.rb`:
 
-TODO: Write usage instructions here
+```ruby
+Rails.application.routes.draw do
+  mount Moba::Engine => "/admin"
+end
+```
 
-## Development
+## Configurazione
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Puoi personalizzare Moba con un initializer (es. `config/initializers/moba.rb`):
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```ruby
+Moba.configure do |config|
+  config.namespace = "admin"
+  config.mount_path = "/admin"
+  config.current_user_method = :current_user
+end
+```
 
-## Contributing
+| Opzione | Default | Descrizione |
+|---------|---------|-------------|
+| `namespace` | `"admin"` | Namespace usato nelle URL |
+| `mount_path` | `"/admin"` | Percorso di mount dell'engine |
+| `current_user_method` | `:current_user` | Metodo per ottenere l'utente corrente |
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/moba.
+## Creare una risorsa
 
-## License
+Crea un file in `app/moba/resources/` per ogni modello che vuoi gestire. Esempio per il modello `User`:
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+```ruby
+# app/moba/resources/user_resource.rb
+
+class UserResource < Moba::Resource
+  self.model_class = "User"
+
+  field :first_name, type: :text, required: true
+  field :last_name, type: :text, required: true
+  field :email, type: :email, required: true
+  field :role, type: :select, options: %w[user admin manager]
+end
+
+Moba.register_resource(UserResource)
+```
+
+Tipi di campo disponibili: `:text`, `:email`, `:select`.
+
+## Build degli asset
+
+Compila JavaScript e CSS:
+
+```bash
+npm run build
+```
+
+In fase di sviluppo, usa la modalita' watch per ricompilare automaticamente:
+
+```bash
+npm run watch
+```
+
+## Avviare il server
+
+```bash
+bin/rails s
+```
+
+Naviga a [http://localhost:3000/admin](http://localhost:3000/admin) per accedere al pannello.
+
+## Sviluppo
+
+```bash
+# Setup iniziale
+bin/setup
+
+# Eseguire i test
+bundle exec rspec
+
+# Console interattiva
+bin/console
+
+# Watch mode per gli asset
+npm run watch
+```
+
+## Licenza
+
+Distribuito con licenza [MIT](https://opensource.org/licenses/MIT).

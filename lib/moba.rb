@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "moba/version"
+require_relative "moba/resource"
 require_relative "moba/engine"
 
 module Moba
@@ -12,6 +13,22 @@ module Moba
   def self.configure
     self.configuration ||= Configuration.new
     yield(configuration) if block_given?
+  end
+
+  # Resource registry
+  mattr_accessor :resources, default: {}
+
+  def self.register_resource(resource_class)
+    key = resource_class.plural_resource_name
+    resources[key] = resource_class
+  end
+
+  def self.resource_for(key)
+    resources[key.to_s]
+  end
+
+  def self.registered_resources
+    resources.values
   end
 
   class Configuration

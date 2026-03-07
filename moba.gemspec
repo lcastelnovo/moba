@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   # Runtime dependencies
   spec.add_dependency "rails", ">= 7.0"
   spec.add_dependency "superglue"
+  spec.add_dependency "propshaft"
 
   # Development dependencies
   spec.add_development_dependency "rspec-rails", "~> 7.1"

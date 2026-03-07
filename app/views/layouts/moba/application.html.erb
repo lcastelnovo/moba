@@ -6,8 +6,8 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="stylesheet" href="/moba.css" media="all" />
-    <script src="/moba.js" type="module"></script>
+    <%= stylesheet_link_tag "moba", media: "all" %>
+    <%= javascript_include_tag "moba", type: "module" %>
   </head>
 
   <body>
