@@ -13,7 +13,7 @@ Pannello di amministrazione moderno per Rails, costruito con React, TypeScript e
 Aggiungi la gem al `Gemfile` della tua applicazione Rails:
 
 ```ruby
-gem "moba", path: "/path/to/moba"
+gem "moba", github: "lcastelnovo/moba"
 ```
 
 Installa le dipendenze:
