@@ -6,11 +6,15 @@ import { DataTable } from "@moba/components/DataTable";
 import { Button } from "@moba/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { Eye, Pencil, Trash2, Plus } from "lucide-react";
+import { TableFilters } from "@moba/components/TableFilters";
 
 type Field = {
   name: string;
+  attribute: string;
   type: string;
   label: string;
+  options?: string[];
+  filterable?: boolean;
 };
 
 type ResourceIndexProps = {
@@ -19,11 +23,12 @@ type ResourceIndexProps = {
   singularName: string;
   basePath: string;
   fields: Field[];
+  filters: Record<string, string>;
   records: Record<string, any>[];
 };
 
 export default function ResourceIndex() {
-  const { resourceName, resourceKey, singularName, basePath, fields, records } =
+  const { resourceName, resourceKey, singularName, basePath, fields, filters, records } =
     useContent<ResourceIndexProps>();
   const { visit } = useContext(NavigationContext);
 
@@ -96,6 +101,12 @@ export default function ResourceIndex() {
           </a>
         </Button>
       </div>
+      <TableFilters
+        fields={fields}
+        filters={filters}
+        basePath={basePath}
+        resourceKey={resourceKey}
+      />
       <DataTable columns={columns} data={records} />
     </Layout>
   );

@@ -3,6 +3,7 @@ json.resourceKey params[:resource_id]
 json.singularName @resource_class.human_name
 
 json.fields @fields
+json.filters @filters
 
 json.records do
   json.array! @records do |record|

@@ -8,6 +8,19 @@ module Moba
     def index
       @records = @resource_class.model_klass.all
       @fields = @resource_class.serialized_fields
+      @filters = (params[:filters]&.permit!&.to_h || {}).select { |_, v| v.present? }
+
+      @filters.each do |field_name, value|
+        field_config = @resource_class.fields_config.find { |f| f[:name].to_s == field_name }
+        next unless field_config
+        next unless field_config.fetch(:filterable, false)
+
+        if field_config[:options]
+          @records = @records.where(field_name => value)
+        else
+          @records = @records.where("LOWER(#{@resource_class.model_klass.connection.quote_column_name(field_name)}) LIKE ?", "%#{value.downcase}%")
+        end
+      end
     end
 
     def show
