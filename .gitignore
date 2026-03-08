@@ -12,7 +12,8 @@
 
 # Node modules and builds
 /node_modules/
-/app/assets/builds/*.map
+/app/assets/builds/
+!/app/assets/builds/.keep
 
 # Database
 /spec/dummy/db/*.sqlite3
@@ -20,3 +21,6 @@
 
 # IDE
 .idea/
+
+# Claude
+CLAUDE.md

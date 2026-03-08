@@ -7,6 +7,10 @@ module Moba
   class Engine < ::Rails::Engine
     isolate_namespace Moba
 
+    rake_tasks do
+      load File.join(root, "lib/tasks/moba_tasks.rake")
+    end
+
     config.generators do |g|
       g.test_framework :rspec
       g.assets false

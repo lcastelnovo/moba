@@ -22,6 +22,12 @@ Installa le dipendenze:
 bundle install
 ```
 
+Compila gli asset del pannello admin:
+
+```bash
+rake moba:assets:build
+```
+
 Monta l'engine nel file `config/routes.rb`:
 
 ```ruby
@@ -29,6 +35,8 @@ Rails.application.routes.draw do
   mount Moba::Engine => "/admin"
 end
 ```
+
+> **Nota**: in produzione, `rake assets:precompile` compila automaticamente anche gli asset di Moba.
 
 ## Configurazione
 
@@ -71,17 +79,19 @@ Tipi di campo disponibili: `:text`, `:email`, `:select`.
 
 ## Build degli asset
 
-Compila JavaScript e CSS:
+Compila gli asset di Moba (JavaScript e CSS):
 
 ```bash
-npm run build
+rake moba:assets:build
 ```
 
 In fase di sviluppo, usa la modalita' watch per ricompilare automaticamente:
 
 ```bash
-npm run watch
+rake moba:assets:watch
 ```
+
+In produzione, `rake assets:precompile` include automaticamente il build di Moba.
 
 ## Avviare il server
 
