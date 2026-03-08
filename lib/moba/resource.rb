@@ -51,7 +51,8 @@ module Moba
             label: f.fetch(:label, f[:name].to_s.titleize),
             required: f.fetch(:required, false),
             readonly: f.fetch(:readonly, false),
-            options: f.fetch(:options, nil)
+            options: f.fetch(:options, nil),
+            filterable: f.fetch(:filterable, false) || nil
           }.compact
         end
       end

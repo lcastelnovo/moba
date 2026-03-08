@@ -77,6 +77,30 @@ Moba.register_resource(UserResource)
 
 Tipi di campo disponibili: `:text`, `:email`, `:select`.
 
+## Filtri
+
+Puoi abilitare i filtri sulla tabella aggiungendo `filterable: true` alla definizione di un campo:
+
+```ruby
+class UserResource < Moba::Resource
+  self.model_class = "User"
+
+  field :first_name, type: :text, required: true, filterable: true
+  field :last_name, type: :text, required: true
+  field :email, type: :email, required: true, filterable: true
+  field :role, type: :select, options: %w[user admin manager], filterable: true
+end
+```
+
+Il comportamento del filtro dipende dal tipo di campo:
+
+| Tipo | Filtro |
+|------|--------|
+| `:select` | Dropdown con le opzioni definite |
+| `:text`, `:email` | Ricerca parziale (case-insensitive) |
+
+I filtri sono applicati server-side e salvati nell'URL come query string, quindi sono condivisibili. La navigazione avviene via SPA senza ricaricare la pagina.
+
 ## Build degli asset
 
 Compila gli asset di Moba (JavaScript e CSS):
