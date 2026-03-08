@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+# Auto-build Moba assets when running assets:precompile
+if Rake::Task.task_defined?("assets:precompile")
+  Rake::Task["assets:precompile"].enhance(["moba:assets:build"])
+end
+
 namespace :moba do
   namespace :assets do
     desc "Build Moba admin panel assets (JS + CSS)"
