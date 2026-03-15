@@ -101,6 +101,24 @@ Il comportamento del filtro dipende dal tipo di campo:
 
 I filtri sono applicati server-side e salvati nell'URL come query string, quindi sono condivisibili. La navigazione avviene via SPA senza ricaricare la pagina.
 
+## Paginazione
+
+La tabella mostra 25 record per pagina di default. Puoi personalizzare il numero di record per pagina nella resource:
+
+```ruby
+class UserResource < Moba::Resource
+  self.model_class = "User"
+  self.per_page = 50
+
+  field :first_name, type: :text, required: true
+  # ...
+end
+```
+
+La paginazione e' gestita server-side e preserva filtri e ordinamento nell'URL.
+
+
+
 ## Build degli asset
 
 Compila gli asset di Moba (JavaScript e CSS):
