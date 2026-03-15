@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@moba/components/ui/select";
+import { buildResourceUrl } from "@moba/lib/navigation";
 
 type Field = {
   name: string;
@@ -24,6 +25,8 @@ type TableFiltersProps = {
   filters: Record<string, string>;
   basePath: string;
   resourceKey: string;
+  sort?: string;
+  direction?: string;
 };
 
 const ALL_VALUE = "__all__";
@@ -33,6 +36,8 @@ export function TableFilters({
   filters,
   basePath,
   resourceKey,
+  sort,
+  direction,
 }: TableFiltersProps) {
   const { visit } = useContext(NavigationContext);
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
@@ -41,15 +46,15 @@ export function TableFilters({
 
   const navigateWithFilters = useCallback(
     (newFilters: Record<string, string>) => {
-      const params = new URLSearchParams();
-      Object.entries(newFilters).forEach(([k, v]) => {
-        if (v) params.append(`filters[${k}]`, v);
+      const url = buildResourceUrl(basePath, resourceKey, {
+        filters: newFilters,
+        sort: sort || undefined,
+        direction: direction || undefined,
+        page: 1,
       });
-      const query = params.toString();
-      const url = `${basePath}/${resourceKey}${query ? `?${query}` : ""}`;
       visit(url, {});
     },
-    [visit, basePath, resourceKey]
+    [visit, basePath, resourceKey, sort, direction]
   );
 
   const applyFilter = useCallback(

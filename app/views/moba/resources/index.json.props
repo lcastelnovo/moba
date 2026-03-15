@@ -4,6 +4,15 @@ json.singularName @resource_class.human_name
 
 json.fields @fields
 json.filters @filters
+json.sort @sort
+json.direction @direction
+
+json.pagination do
+  json.currentPage @page
+  json.totalPages @total_pages
+  json.totalCount @total_count
+  json.perPage @per_page
+end
 
 json.records do
   json.array! @records do |record|
