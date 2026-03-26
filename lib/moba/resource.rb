@@ -4,6 +4,7 @@ module Moba
   class Resource
     class_attribute :model_class_name
     class_attribute :fields_config, default: []
+    class_attribute :per_page, default: 25
 
     class << self
       def model_class=(name)

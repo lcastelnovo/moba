@@ -21,6 +21,25 @@ module Moba
           @records = @records.where("LOWER(#{@resource_class.model_klass.connection.quote_column_name(field_name)}) LIKE ?", "%#{value.downcase}%")
         end
       end
+
+      # Sorting
+      @sort = params[:sort].to_s
+      @direction = params[:direction].to_s.downcase == "desc" ? "desc" : "asc"
+      sort_field = @resource_class.fields_config.find { |f| f[:name].to_s == @sort }
+      if sort_field
+        quoted_column = @resource_class.model_klass.connection.quote_column_name(@sort)
+        @records = @records.order(Arel.sql("#{quoted_column} #{@direction}"))
+      else
+        @sort = nil
+        @direction = nil
+      end
+
+      # Pagination
+      @per_page = @resource_class.per_page
+      @total_count = @records.count
+      @total_pages = [(@total_count.to_f / @per_page).ceil, 1].max
+      @page = [[params[:page].to_i, 1].max, @total_pages].min
+      @records = @records.offset((@page - 1) * @per_page).limit(@per_page)
     end
 
     def show
