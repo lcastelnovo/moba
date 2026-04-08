@@ -10,10 +10,11 @@ type ResourceNewProps = {
   fields: any[];
   record: Record<string, any>;
   errors: Record<string, string[]>;
+  belongsToOptions: Record<string, { id: number; label: string }[]>;
 };
 
 export default function ResourceNew() {
-  const { resourceName, resourceKey, basePath, fields, record, errors } =
+  const { resourceName, resourceKey, basePath, fields, record, errors, belongsToOptions } =
     useContent<ResourceNewProps>();
 
   return (
@@ -24,6 +25,7 @@ export default function ResourceNew() {
         fields={fields}
         record={record}
         errors={errors}
+        belongsToOptions={belongsToOptions}
         method="post"
         action={`${basePath}/${resourceKey}`}
         backUrl={`${basePath}/${resourceKey}`}

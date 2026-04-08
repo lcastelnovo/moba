@@ -3,6 +3,17 @@ json.resourceKey params[:resource_id]
 
 json.fields @fields
 
+json.belongsToOptions do
+  @belongs_to_options.each do |field_name, options|
+    json.set! field_name do
+      json.array! options do |opt|
+        json.id opt[:id]
+        json.label opt[:label]
+      end
+    end
+  end
+end
+
 json.record do
   json.id @record.id
   @fields.each do |field|

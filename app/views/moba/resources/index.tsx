@@ -1,15 +1,19 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useMemo, useState, useCallback, useRef } from "react";
 import { NavigationContext } from "@thoughtbot/superglue";
 import { useContent } from "@moba/hooks/useContent";
 import { Layout } from "@moba/components/Layout";
 import { DataTable } from "@moba/components/DataTable";
 import { Button } from "@moba/components/ui/button";
+import { Input } from "@moba/components/ui/input";
+import { Badge } from "@moba/components/ui/badge";
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye, Pencil, Trash2, Plus, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Eye, Pencil, Trash2, Plus, ArrowUpDown, ArrowUp, ArrowDown, Search } from "lucide-react";
 import { TableFilters } from "@moba/components/TableFilters";
 import { TablePagination } from "@moba/components/TablePagination";
 import { DeleteConfirmDialog } from "@moba/components/DeleteConfirmDialog";
 import { buildResourceUrl } from "@moba/lib/navigation";
+
+type BelongsToOption = { id: number; label: string };
 
 type Field = {
   name: string;
@@ -18,6 +22,8 @@ type Field = {
   label: string;
   options?: string[];
   filterable?: boolean;
+  association?: string;
+  display?: string;
 };
 
 type PaginationData = {
@@ -36,8 +42,10 @@ type ResourceIndexProps = {
   filters: Record<string, string>;
   sort: string | null;
   direction: string | null;
+  query: string | null;
   pagination: PaginationData;
   records: Record<string, any>[];
+  belongsToOptions: Record<string, BelongsToOption[]>;
 };
 
 export default function ResourceIndex() {
@@ -50,11 +58,33 @@ export default function ResourceIndex() {
     filters,
     sort,
     direction,
+    query,
     pagination,
     records,
+    belongsToOptions,
   } = useContent<ResourceIndexProps>();
   const { visit } = useContext(NavigationContext);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+      searchTimer.current = setTimeout(() => {
+        visit(
+          buildResourceUrl(basePath, resourceKey, {
+            filters,
+            sort: sort || undefined,
+            direction: direction || undefined,
+            q: value || undefined,
+            page: 1,
+          }),
+          {}
+        );
+      }, 300);
+    },
+    [visit, basePath, resourceKey, filters, sort, direction]
+  );
 
   const handleDelete = async () => {
     if (deleteTarget === null) return;
@@ -88,6 +118,7 @@ export default function ResourceIndex() {
         filters,
         sort: newSort,
         direction: newDirection,
+        q: query || undefined,
         page: 1,
       }),
       {}
@@ -129,6 +160,25 @@ export default function ResourceIndex() {
                 <SortIcon fieldName={field.attribute} />
               </button>
             ),
+            cell: ({ row }) => {
+              const val = row.getValue(field.name);
+              if (field.type === "boolean") {
+                return (
+                  <Badge variant={val ? "default" : "secondary"}>
+                    {val ? "Yes" : "No"}
+                  </Badge>
+                );
+              }
+              if (field.type === "date" && val) {
+                return new Date(val as string).toLocaleDateString();
+              }
+              if (field.type === "belongs_to") {
+                const opts = belongsToOptions[field.name] || [];
+                const match = opts.find((o) => o.id === val);
+                return match ? match.label : String(val ?? "");
+              }
+              return val != null ? String(val) : "";
+            },
           })
         ),
     ];
@@ -163,7 +213,7 @@ export default function ResourceIndex() {
     });
 
     return fieldColumns;
-  }, [fields, resourceKey, sort, direction]);
+  }, [fields, resourceKey, sort, direction, belongsToOptions]);
 
   return (
     <Layout>
@@ -176,6 +226,15 @@ export default function ResourceIndex() {
           </a>
         </Button>
       </div>
+      <div className="relative max-w-sm">
+        <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+        <Input
+          className="pl-8"
+          placeholder="Search..."
+          defaultValue={query || ""}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
       <TableFilters
         fields={fields}
         filters={filters}
@@ -183,6 +242,8 @@ export default function ResourceIndex() {
         resourceKey={resourceKey}
         sort={sort || undefined}
         direction={direction || undefined}
+        q={query || undefined}
+        belongsToOptions={belongsToOptions}
       />
       <DataTable columns={columns} data={records} />
       <TablePagination
@@ -192,6 +253,7 @@ export default function ResourceIndex() {
         filters={filters}
         sort={sort || undefined}
         direction={direction || undefined}
+        q={query || undefined}
       />
       <DeleteConfirmDialog
         open={deleteTarget !== null}

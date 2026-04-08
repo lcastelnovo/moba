@@ -11,6 +11,8 @@ import {
 } from "@moba/components/ui/select";
 import { buildResourceUrl } from "@moba/lib/navigation";
 
+type BelongsToOption = { id: number; label: string };
+
 type Field = {
   name: string;
   attribute: string;
@@ -27,6 +29,8 @@ type TableFiltersProps = {
   resourceKey: string;
   sort?: string;
   direction?: string;
+  q?: string;
+  belongsToOptions?: Record<string, BelongsToOption[]>;
 };
 
 const ALL_VALUE = "__all__";
@@ -38,6 +42,8 @@ export function TableFilters({
   resourceKey,
   sort,
   direction,
+  q,
+  belongsToOptions = {},
 }: TableFiltersProps) {
   const { visit } = useContext(NavigationContext);
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
@@ -50,6 +56,7 @@ export function TableFilters({
         filters: newFilters,
         sort: sort || undefined,
         direction: direction || undefined,
+        q: q || undefined,
         page: 1,
       });
       visit(url, {});
@@ -87,7 +94,26 @@ export function TableFilters({
       {filterableFields.map((field) => (
         <div key={field.attribute} className="flex flex-col gap-1.5">
           <Label>{field.label}</Label>
-          {field.options ? (
+          {field.type === "belongs_to" && belongsToOptions[field.name] ? (
+            <Select
+              value={filters[field.attribute] || ALL_VALUE}
+              onValueChange={(v) =>
+                applyFilter(field.attribute, v === ALL_VALUE ? "" : v)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_VALUE}>All</SelectItem>
+                {belongsToOptions[field.name].map((opt) => (
+                  <SelectItem key={opt.id} value={String(opt.id)}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : field.options ? (
             <Select
               value={filters[field.attribute] || ALL_VALUE}
               onValueChange={(v) =>

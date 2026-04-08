@@ -17,6 +17,7 @@ type TablePaginationProps = {
   filters: Record<string, string>;
   sort?: string;
   direction?: string;
+  q?: string;
 };
 
 export function TablePagination({
@@ -26,6 +27,7 @@ export function TablePagination({
   filters,
   sort,
   direction,
+  q,
 }: TablePaginationProps) {
   const { visit } = useContext(NavigationContext);
   const { currentPage, totalPages, totalCount, perPage } = pagination;
@@ -33,7 +35,7 @@ export function TablePagination({
   if (totalPages <= 1) return null;
 
   const goToPage = (page: number) => {
-    visit(buildResourceUrl(basePath, resourceKey, { filters, sort, direction, page }), {});
+    visit(buildResourceUrl(basePath, resourceKey, { filters, sort, direction, q, page }), {});
   };
 
   const start = (currentPage - 1) * perPage + 1;

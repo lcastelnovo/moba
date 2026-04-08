@@ -2,6 +2,7 @@ import React from "react";
 import { useContent } from "@moba/hooks/useContent";
 import { Layout } from "@moba/components/Layout";
 import { Button } from "@moba/components/ui/button";
+import { Badge } from "@moba/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -9,6 +10,8 @@ import {
   CardTitle,
 } from "@moba/components/ui/card";
 import { ArrowLeft, Pencil } from "lucide-react";
+
+type BelongsToOption = { id: number; label: string };
 
 type Field = {
   name: string;
@@ -22,11 +25,28 @@ type ResourceShowProps = {
   basePath: string;
   fields: Field[];
   record: Record<string, any>;
+  belongsToOptions: Record<string, BelongsToOption[]>;
 };
 
 export default function ResourceShow() {
-  const { resourceName, resourceKey, basePath, fields, record } =
+  const { resourceName, resourceKey, basePath, fields, record, belongsToOptions } =
     useContent<ResourceShowProps>();
+
+  const formatValue = (field: Field, value: any) => {
+    if (value == null) return "\u2014";
+    if (field.type === "boolean") {
+      return <Badge variant={value ? "default" : "secondary"}>{value ? "Yes" : "No"}</Badge>;
+    }
+    if (field.type === "date" && value) {
+      return new Date(value).toLocaleDateString();
+    }
+    if (field.type === "belongs_to") {
+      const opts = belongsToOptions[field.name] || [];
+      const match = opts.find((o) => o.id === value);
+      return match ? match.label : String(value);
+    }
+    return String(value);
+  };
 
   return (
     <Layout>
@@ -65,9 +85,7 @@ export default function ResourceShow() {
                   {field.label}
                 </dt>
                 <dd className="text-sm">
-                  {record[field.name] != null
-                    ? String(record[field.name])
-                    : "—"}
+                  {formatValue(field, record[field.name])}
                 </dd>
               </div>
             ))}

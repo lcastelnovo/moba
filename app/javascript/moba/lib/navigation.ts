@@ -3,6 +3,7 @@ type BuildResourceUrlOptions = {
   sort?: string;
   direction?: string;
   page?: number;
+  q?: string;
 };
 
 export function buildResourceUrl(
@@ -25,6 +26,10 @@ export function buildResourceUrl(
 
   if (options.page && options.page > 1) {
     params.append("page", String(options.page));
+  }
+
+  if (options.q) {
+    params.append("q", options.q);
   }
 
   const query = params.toString();

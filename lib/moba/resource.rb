@@ -40,22 +40,39 @@ module Moba
       end
 
       def permitted_fields
-        fields_config.select { |f| f.fetch(:readonly, false) == false }.map { |f| f[:name] }
+        fields_config.select { |f| f.fetch(:readonly, false) == false }.map do |f|
+          if f[:type] == :belongs_to
+            :"#{f[:name]}_id"
+          else
+            f[:name]
+          end
+        end
       end
 
       def serialized_fields
         fields_config.map do |f|
-          {
+          base = {
             name: f[:name].to_s.camelize(:lower),
-            attribute: f[:name].to_s,
+            attribute: f[:type] == :belongs_to ? "#{f[:name]}_id" : f[:name].to_s,
             type: f[:type].to_s,
             label: f.fetch(:label, f[:name].to_s.titleize),
             required: f.fetch(:required, false),
             readonly: f.fetch(:readonly, false),
             options: f.fetch(:options, nil),
             filterable: f.fetch(:filterable, false) || nil
-          }.compact
+          }
+
+          if f[:type] == :belongs_to
+            base[:association] = f[:association].to_s
+            base[:display] = f[:display].to_s
+          end
+
+          base.compact
         end
+      end
+
+      def belongs_to_fields
+        fields_config.select { |f| f[:type] == :belongs_to }
       end
     end
   end

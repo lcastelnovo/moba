@@ -10,12 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@moba/components/ui/select";
+import { Checkbox } from "@moba/components/ui/checkbox";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@moba/components/ui/card";
+
+type BelongsToOption = { id: number; label: string };
 
 type Field = {
   name: string;
@@ -25,6 +28,8 @@ type Field = {
   required?: boolean;
   readonly?: boolean;
   options?: string[];
+  association?: string;
+  display?: string;
 };
 
 type ResourceFormProps = {
@@ -33,6 +38,7 @@ type ResourceFormProps = {
   fields: Field[];
   record: Record<string, any>;
   errors: Record<string, string[]>;
+  belongsToOptions?: Record<string, BelongsToOption[]>;
   method: "post" | "patch";
   action: string;
   backUrl: string;
@@ -44,6 +50,7 @@ export function ResourceForm({
   fields,
   record,
   errors,
+  belongsToOptions = {},
   method,
   action,
   backUrl,
@@ -53,7 +60,11 @@ export function ResourceForm({
     const initial: Record<string, any> = {};
     fields.forEach((field) => {
       if (!field.readonly) {
-        initial[field.name] = record[field.name] ?? "";
+        if (field.type === "boolean") {
+          initial[field.name] = record[field.name] ?? false;
+        } else {
+          initial[field.name] = record[field.name] ?? "";
+        }
       }
     });
     return initial;
@@ -101,7 +112,34 @@ export function ResourceForm({
           {field.required && <span className="text-destructive ml-1">*</span>}
         </Label>
 
-        {field.type === "select" && field.options ? (
+        {field.type === "boolean" ? (
+          <div className="flex items-center gap-2 pt-1">
+            <Checkbox
+              id={field.name}
+              checked={!!value}
+              onCheckedChange={(checked) => handleChange(field.name, !!checked)}
+            />
+            <Label htmlFor={field.name} className="text-sm font-normal">
+              {value ? "Yes" : "No"}
+            </Label>
+          </div>
+        ) : field.type === "belongs_to" ? (
+          <Select
+            value={value ? String(value) : ""}
+            onValueChange={(val) => handleChange(field.name, Number(val))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={`Select ${field.label}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {(belongsToOptions[field.name] || []).map((opt) => (
+                <SelectItem key={opt.id} value={String(opt.id)}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : field.type === "select" && field.options ? (
           <Select
             value={String(value)}
             onValueChange={(val) => handleChange(field.name, val)}
@@ -128,7 +166,7 @@ export function ResourceForm({
         ) : (
           <Input
             id={field.name}
-            type={field.type === "number" ? "number" : field.type === "email" ? "email" : "text"}
+            type={field.type === "date" ? "date" : field.type === "number" ? "number" : field.type === "email" ? "email" : "text"}
             value={value}
             onChange={(e) => handleChange(field.name, e.target.value)}
             required={field.required}
